@@ -17,45 +17,42 @@ extern "C"
 #endif //__cplusplus
 
     // [0] 初始化
-    CORE_LIB_API void core_init(int argc, char* argv[]);
+    CORE_LIB_API void core_init(int argc, char *argv[]);
 
     // [1] 网络
-    
+
     // Tcp Client
-    typedef void* TcpClientPtr;
-    typedef void* SocketPtr;
+    typedef void *TcpClientPtr;
+
+    typedef void *SocketPtr;
     typedef void (*HandleRun)();
     typedef void (*HandleClose)();
-    typedef void (*HandleNewConn)(SocketPtr id);
-    typedef void (*HandleCloseConn)(SocketPtr id);
-    typedef void (*HandleConnOnRead)(SocketPtr id, const char* buf, size_t len);
+    typedef void (*HandleNewConn)(SocketPtr socket_ptr);
+    typedef void (*HandleCloseConn)(SocketPtr socket_ptr);
+    typedef void (*HandleConnOnRead)(SocketPtr socket_ptr, const char *buf, size_t len);
 
     CORE_LIB_API TcpClientPtr new_tcp_client(
-        const char* ip, 
-        int port, 
-        const char* logName = nullptr
-    );
-
-    CORE_LIB_API void tcp_client_run(
-        TcpClientPtr tcpClient,
+        const char *ip,
+        int port,
         HandleRun fRun = nullptr,
         HandleClose fClose = nullptr,
         HandleNewConn fNewConn = nullptr,
         HandleCloseConn fCloseConn = nullptr,
-        HandleConnOnRead fConnOnRead = nullptr
-    );
-    
-    CORE_LIB_API void tcp_client_close(TcpClientPtr tcpClient);
-    
+        HandleConnOnRead fConnOnRead = nullptr);
+
     CORE_LIB_API void del_tcp_client(TcpClientPtr tcpClient);
+
+    CORE_LIB_API void tcp_client_write(
+        TcpClientPtr tcpClient,
+        const char *buf,
+        int len);
 
     // Tcp Server PingPong
     CORE_LIB_API void pingpong_server_run(
-        const char* ip, 
-        int port, 
-        const char* logName = nullptr
-    );
-    
+        const char *ip,
+        int port,
+        const char *logName = nullptr);
+
     // [2] 结束退出
     CORE_LIB_API void core_shutdown();
 

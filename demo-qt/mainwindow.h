@@ -1,8 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "ztcpclient.h"
+#include "tcpclient.h"
+
 #include <QMainWindow>
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,12 +23,13 @@ public slots:
 
     void on_btnRun_clicked();
     void on_btnReq_clicked();
-    void on_btnPush_clicked();
+    void on_btnTimer_clicked();
 
-    void on_tcp_read(QString buf);
+    void on_tcp_read(const char* buf, int len);
 
 private:
     Ui::MainWindow *ui;
-    ZTcpClient m_zTcpClient;
+    TcpClient m_tcpClient;
+    QTimer m_timer;
 };
 #endif // MAINWINDOW_H

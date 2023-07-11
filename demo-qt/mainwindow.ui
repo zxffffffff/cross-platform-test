@@ -220,14 +220,14 @@
               <item>
                <widget class="QPushButton" name="btnReq">
                 <property name="text">
-                 <string>tcp-req</string>
+                 <string>ping-pong</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="btnPush">
+               <widget class="QPushButton" name="btnTimer">
                 <property name="text">
-                 <string>tcp-push</string>
+                 <string>100 QPS</string>
                 </property>
                </widget>
               </item>
@@ -246,15 +246,7 @@
        <attribute name="title">
         <string>Tab 2</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QPlainTextEdit" name="editMsg">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <layout class="QVBoxLayout" name="verticalLayout_3"/>
       </widget>
      </widget>
     </item>

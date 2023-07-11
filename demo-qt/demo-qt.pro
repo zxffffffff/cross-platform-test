@@ -11,11 +11,11 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    ztcpclient.cpp
+    tcpclient.cpp
 
 HEADERS += \
     mainwindow.h \
-    ztcpclient.h
+    tcpclient.h
 
 FORMS += \
     mainwindow.ui
@@ -24,3 +24,8 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+LIBS += -L$$PWD/../lib-net/install/Release/lib/ -lCore
+
+INCLUDEPATH += $$PWD/../lib-net/src
+DEPENDPATH += $$PWD/../lib-net/src

@@ -10,20 +10,18 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setFixedSize(1920, 1080);
 
     connect(ui->spinBox_row, &QSpinBox::textChanged, this, &MainWindow::onRowColChanged);
     connect(ui->spinBox_col, &QSpinBox::textChanged, this, &MainWindow::onRowColChanged);
     onRowColChanged();
 
-    connect(&m_zTcpClient, &ZTcpClient::sgnDebugStr, [this](QString msg)
-    {
-        QString t = QTime::currentTime().toString("hh:mm:ss.zzz");
-        ui->editMsg->appendPlainText(t + " " + msg);
-    });
-    connect(&m_zTcpClient, &ZTcpClient::sgnOnRead, this, &MainWindow::on_tcp_read);
+    connect(&m_tcpClient, &TcpClient::sgnOnRead, this, &MainWindow::on_tcp_read);
+
+    connect(&m_timer, &QTimer::timeout, this, [this]{ on_btnReq_clicked(); });
 
     ui->btnReq->setEnabled(false);
-    ui->btnPush->setEnabled(false);
+    ui->btnTimer->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -52,63 +50,82 @@ void MainWindow::onRowColChanged()
 void MainWindow::on_btnRun_clicked()
 {
     if(ui->btnRun->text() == "stop") {
-        m_zTcpClient.Stop();
+        m_tcpClient.close();
 
         ui->editAddr->setEnabled(true);
         ui->editPort->setEnabled(true);
         ui->btnRun->setText("run");
         ui->btnReq->setEnabled(false);
-        ui->btnPush->setEnabled(false);
+        ui->btnTimer->setEnabled(false);
         return;
     }
 
-    ui->editMsg->clear();
-
     QString addr = ui->editAddr->text();
     int port = ui->editPort->text().toInt();
-    bool ok = m_zTcpClient.Start(addr, port);
-    if (!ok)
-        return;
+    m_tcpClient.run(addr.toLocal8Bit().data(), port);
 
     ui->editAddr->setEnabled(false);
     ui->editPort->setEnabled(false);
     ui->btnRun->setText("stop");
     ui->btnReq->setEnabled(true);
-    ui->btnPush->setEnabled(true);
+    ui->btnTimer->setEnabled(true);
+}
+
+QJsonArray genArray(int row, int col)
+{
+    static int64_t flag = 0;
+    QJsonArray jsonArray;
+    for (int i = 0; i < row; ++i) {
+        QString item;
+        for (int j = 0; j < col; ++j) {
+            if (j > 0)
+                item.append(' ');
+            item.append(QString::number(flag + (i * j * 1000000)));
+        }
+        jsonArray.append(item);
+    }
+    ++flag;
+    return jsonArray;
 }
 
 void MainWindow::on_btnReq_clicked()
 {
+    const int row = ui->spinBox_row->value();
+    const int col = ui->spinBox_col->value();
+
     QJsonObject jsonObject;
-    jsonObject["api"] = "req";
-    jsonObject["row"] = ui->spinBox_row->value();
-    jsonObject["col"] = ui->spinBox_col->value();
+
+    jsonObject["time"] = QTime::currentTime().toString("hh:mm:ss.zzz");
+    jsonObject["data"] = genArray(row, col);
+
     QJsonDocument jsonDocument(jsonObject);
-    QString jsonString = jsonDocument.toJson(QJsonDocument::Indented);
-    m_zTcpClient.Send(jsonString);
+    QByteArray jsonString = jsonDocument.toJson(QJsonDocument::Indented);
+    m_tcpClient.write(jsonString.data(), jsonString.length());
 }
 
-void MainWindow::on_btnPush_clicked()
+void MainWindow::on_btnTimer_clicked()
 {
-    QJsonObject jsonObject;
-    jsonObject["api"] = "push";
-    jsonObject["row"] = ui->spinBox_row->value();
-    jsonObject["col"] = ui->spinBox_col->value();
-    QJsonDocument jsonDocument(jsonObject);
-    QString jsonString = jsonDocument.toJson(QJsonDocument::Indented);
-    m_zTcpClient.Send(jsonString);
+    m_timer.isActive() ? m_timer.stop()
+                       : m_timer.start(10);
 }
 
-void MainWindow::on_tcp_read(QString buf)
+void MainWindow::on_tcp_read(const char* buf, int len)
 {
-    QJsonDocument jsonDocument = QJsonDocument::fromJson(buf.toUtf8());
+    QByteArray jsonString(buf, len);
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString);
     QJsonObject jsonObject = jsonDocument.object();
+
+    QString time = jsonObject["time"].toString();
+    QString time2 = QTime::currentTime().toString("hh:mm:ss.zzz");
+    ui->lbTit->setText(tr("%1__%2").arg(time).arg(time2));
+
     QJsonArray jsonArray = jsonObject["data"].toArray();
     const int row = jsonArray.size();
+    int col = 0;
     for (int i = 0; i < row; ++i) {
         QString item = jsonArray.at(i).toString();
         auto list = item.split(' ');
-        const int col = list.size();
+        col = list.size();
         for (int j = 0; j < col; ++j) {
             auto p = ui->tableWidget->item(i, j);
             if (p) {
