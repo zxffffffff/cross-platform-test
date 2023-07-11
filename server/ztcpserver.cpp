@@ -27,7 +27,7 @@ ZTcpServer::ZTcpServer(QObject *parent)
 {
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &ZTcpServer::slotTimeout);
-    timer->start(10);
+    timer->start(16); // 60 FPS
 }
 
 ZTcpServer::~ZTcpServer()
@@ -70,8 +70,9 @@ bool ZTcpServer::Send(QTcpSocket* socket, QString msg)
     if (m_tcpClients.find(socket) == m_tcpClients.end())
         return false;
 
-    auto len =  socket->write(msg.toLocal8Bit());
-    emit sgnDebugStr("write: " + msg);
+    QByteArray buf = msg.toLocal8Bit();
+    auto len =  socket->write(buf);
+    emit sgnDebugStr("send: " + msg);
     return len;
 }
 
@@ -119,7 +120,7 @@ void ZTcpServer::slotStateChanged(QAbstractSocket::SocketState socketState)
         m_tcpClients.erase(ite);
         m_tcpPush.erase(socket);
     } else {
-        emitDebugStr(socket, "stateChanged:" + QVariant::fromValue(socketState).toString() + " ????????");
+        emitDebugStr(socket, "stateChanged:" + QVariant::fromValue(socketState).toString());
     }
 }
 
@@ -131,7 +132,7 @@ void ZTcpServer::slotReadyRead()
     QTcpSocket* socket = *ite;
 
     QByteArray buf = socket->readAll();
-    emitDebugStr(socket, "read: " + buf);
+    emitDebugStr(socket, "recv: " + buf);
 
     QJsonDocument jsonDocument = QJsonDocument::fromJson(buf);
     QJsonObject jsonObject = jsonDocument.object();

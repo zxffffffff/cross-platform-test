@@ -1,5 +1,14 @@
 #include "ztcpclient.h"
 
+QString formatBytes(int len)
+{
+    if (len > 1024)
+        return QString::number(len / 1024.0f, 'f', 1) + " KB";
+    if (len > 1024 * 1024)
+        return QString::number(len / 1024 / 1024.0f, 'f', 1) + " MB";
+    return QString::number(len) + " B";
+}
+
 ZTcpClient::ZTcpClient(QObject *parent)
     : QObject{parent}
 {
@@ -47,8 +56,10 @@ bool ZTcpClient::Send(QString msg)
         return false;
     if (!m_tcpSocket->isOpen())
         return false;
-    auto len =  m_tcpSocket->write(msg.toLocal8Bit());
-    emit sgnDebugStr("write: " + msg);
+
+    QByteArray buf = msg.toLocal8Bit();
+    auto len =  m_tcpSocket->write(buf);
+    emit sgnDebugStr("send: " + formatBytes(buf.length()));
 
     return len;
 }
@@ -65,6 +76,6 @@ void ZTcpClient::slotStateChanged(QAbstractSocket::SocketState socketState)
 void ZTcpClient::slotReadyRead()
 {
     QByteArray buf = m_tcpSocket->readAll();
-    emit sgnDebugStr("read: " + buf);
+    emit sgnDebugStr("recv: " + formatBytes(buf.length()));
     emit sgnOnRead(buf);
 }
