@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
           body: TabBarView(
             children: [
               Center(child: Page1()),
-              Center(child: Page3(title: 'Page2')),
+              Center(child: Page2(title: 'Page2')),
               Center(child: Page3(title: 'Page3')),
             ],
           ),

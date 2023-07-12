@@ -11,10 +11,12 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    mousewidget.cpp \
     tcpclient.cpp
 
 HEADERS += \
     mainwindow.h \
+    mousewidget.h \
     tcpclient.h
 
 FORMS += \

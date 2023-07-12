@@ -83,7 +83,7 @@
               <number>999</number>
              </property>
              <property name="value">
-              <number>40</number>
+              <number>28</number>
              </property>
             </widget>
            </item>
@@ -103,7 +103,7 @@
               <number>999</number>
              </property>
              <property name="value">
-              <number>20</number>
+              <number>18</number>
              </property>
             </widget>
            </item>
@@ -214,7 +214,7 @@
               <item>
                <widget class="QPushButton" name="btnTimer">
                 <property name="text">
-                 <string>100 QPS</string>
+                 <string>timer-10ms</string>
                 </property>
                </widget>
               </item>
@@ -237,7 +237,7 @@
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>页</string>
+        <string>Tab 3</string>
        </attribute>
        <widget class="QPushButton" name="btnPop">
         <property name="geometry">

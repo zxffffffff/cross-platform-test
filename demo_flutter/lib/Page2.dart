@@ -10,40 +10,40 @@ class Page2 extends StatefulWidget {
 }
 
 class _Page2State extends State<Page2> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  var _pos = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    return Container(child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      var size = constraints.biggest;
+
+      return GestureDetector(
+        onPanUpdate: (details) {
+          setState(() {
+            _pos = details.localPosition;
+          });
+        },
+        child: CustomPaint(
+          painter: MyPainter(_pos),
+          size: size,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
+      );
+    }));
   }
+}
+
+class MyPainter extends CustomPainter {
+  Offset _pos;
+  MyPainter(this._pos);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()..color = Colors.red;
+    canvas.drawLine(Offset(_pos.dx, 0), Offset(_pos.dx, size.height), paint);
+    canvas.drawLine(Offset(0, _pos.dy), Offset(size.width, _pos.dy), paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

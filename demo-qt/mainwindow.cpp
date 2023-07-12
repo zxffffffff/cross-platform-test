@@ -10,7 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    resize(1920, 1080);
 
     m_mouseWidget = new MouseWidget();
     ui->verticalLayout_tab2->insertWidget(0, m_mouseWidget);
@@ -138,7 +137,7 @@ void MainWindow::on_tcp_read(const char* buf, int len)
         }
     }
 
-    // 通过事件循环模拟获取耗时，可以理解为paintEvent
+    // 通过事件循环模拟获取耗时
     QTimer::singleShot(1, [=]{
         QDateTime stop = QDateTime::currentDateTime();
         qint64 t_stop = stop.toMSecsSinceEpoch();
