@@ -10,7 +10,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setFixedSize(1920, 1080);
+    resize(1920, 1080);
+
+    m_mouseWidget = new MouseWidget();
+    ui->verticalLayout_tab2->insertWidget(0, m_mouseWidget);
 
     connect(ui->spinBox_row, &QSpinBox::textChanged, this, &MainWindow::onRowColChanged);
     connect(ui->spinBox_col, &QSpinBox::textChanged, this, &MainWindow::onRowColChanged);
@@ -93,9 +96,12 @@ void MainWindow::on_btnReq_clicked()
     const int row = ui->spinBox_row->value();
     const int col = ui->spinBox_col->value();
 
+    QDateTime start = QDateTime::currentDateTime();
+    qint64 t_start = start.toMSecsSinceEpoch();
+
     QJsonObject jsonObject;
 
-    jsonObject["time"] = QTime::currentTime().toString("hh:mm:ss.zzz");
+    jsonObject["time"] = t_start;
     jsonObject["data"] = genArray(row, col);
 
     QJsonDocument jsonDocument(jsonObject);
@@ -115,9 +121,7 @@ void MainWindow::on_tcp_read(const char* buf, int len)
     QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString);
     QJsonObject jsonObject = jsonDocument.object();
 
-    QString time = jsonObject["time"].toString();
-    QString time2 = QTime::currentTime().toString("hh:mm:ss.zzz");
-    ui->lbTit->setText(tr("%1__%2").arg(time).arg(time2));
+    qint64 t_start = jsonObject["time"].toInteger();
 
     QJsonArray jsonArray = jsonObject["data"].toArray();
     const int row = jsonArray.size();
@@ -133,4 +137,18 @@ void MainWindow::on_tcp_read(const char* buf, int len)
             }
         }
     }
+
+    // 通过事件循环模拟获取耗时，可以理解为paintEvent
+    QTimer::singleShot(1, [=]{
+        QDateTime stop = QDateTime::currentDateTime();
+        qint64 t_stop = stop.toMSecsSinceEpoch();
+
+        qDebug() << tr("%1 ms").arg(t_stop - t_start);
+    });
+}
+
+void MainWindow::on_btnPop_clicked()
+{
+    MainWindow *window = new MainWindow();
+    window->show();
 }
