@@ -15,9 +15,9 @@
 |--------------------|------------|-----------|-----------|
 | 开发语言           | C++        | Dart      | JavaScript|
 | 内存占用           | 18 MB      | 75 MB     | 125 MB    |
-| 单次任务 -耗时     | 70 ~ 80 ms | 40 ~ 50 ms | 20 ~ 30 ms |
+| 单次任务 -耗时     | 60 ~ 70 ms | 40 ~ 50 ms | 20 ~ 30 ms |
 | 单次任务 -CPU/GPU  | 1% / 0%    | 1% / 4%   | 1% / 2%   |
-| 定时任务 -耗时     | 70 ~ 80 ms | 40 ~ 50 ms | 40 ~ 50 ms |
+| 定时任务 -耗时     | 60 ~ 70 ms | 40 ~ 50 ms | 40 ~ 50 ms |
 | 定时任务 -CPU/GPU  | 13% / 0%   | 13% / 13% | 24% / 14% |
 | 高频绘制 -鼠标延迟 | 小         | 小        | 非常大     |
 | 高频绘制 -CPU/GPU  | 13% / 0%   | 1% / 22%  | 25% / 5% |
@@ -43,6 +43,7 @@
 ## 二、说明
 
 ### demo-qt
+![image](https://github.com/zxffffffff/cross-platform-test/blob/main/doc/demo-qt.png)
 - 开发：
     - Qt Creator 启动
 - 构建：
@@ -51,12 +52,14 @@
     - 可以移除部分不需要的 dll
 
 ### demo_flutter
+![image](https://github.com/zxffffffff/cross-platform-test/blob/main/doc/demo-flutter.png)
 - 开发：
     - VS Code 启动
 - 构建：
     - `flutter build windows`
 
 ### demo-electron
+![image](https://github.com/zxffffffff/cross-platform-test/blob/main/doc/demo-electron.png)
 - 开发：
     - VS Code 启动
     - npm 下载安装依赖 `npm install`
