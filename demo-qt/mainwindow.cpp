@@ -18,7 +18,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->spinBox_col, &QSpinBox::textChanged, this, &MainWindow::onRowColChanged);
     onRowColChanged();
 
-    connect(&m_tcpClient, &TcpClient::sgnOnRead, this, &MainWindow::on_tcp_read);
+    connect(&m_tcpClient, &TcpClient::sgnOnRead, [this](const char* buf, int len){
+        QByteArray jsonString(buf, len);
+        on_net_read(jsonString);
+    });
+    QObject::connect(&m_httpManager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
+            if (reply->error()) {
+                qDebug() << reply->errorString();
+                return;
+            }
+            QByteArray jsonString = reply->readAll();
+            on_net_read(jsonString);
+        }
+    );
 
     connect(&m_timer, &QTimer::timeout, this, [this]{ on_btnReq_clicked(); });
 
@@ -52,10 +64,13 @@ void MainWindow::onRowColChanged()
 void MainWindow::on_btnRun_clicked()
 {
     if(ui->btnRun->text() == "stop") {
-        m_tcpClient.close();
+        if (m_isTcp) {
+            m_tcpClient.close();
+        }
 
         ui->editAddr->setEnabled(true);
         ui->editPort->setEnabled(true);
+        ui->cbNet->setEnabled(true);
         ui->btnRun->setText("run");
         ui->btnReq->setEnabled(false);
         ui->btnTimer->setEnabled(false);
@@ -64,10 +79,16 @@ void MainWindow::on_btnRun_clicked()
 
     QString addr = ui->editAddr->text();
     int port = ui->editPort->text().toInt();
-    m_tcpClient.run(addr.toLocal8Bit().data(), port);
+    QString net = ui->cbNet->currentText();
+    m_isTcp = (net.toLower() == "tcp");
+
+    if (m_isTcp) {
+        m_tcpClient.run(addr.toLocal8Bit().data(), port);
+    }
 
     ui->editAddr->setEnabled(false);
     ui->editPort->setEnabled(false);
+    ui->cbNet->setEnabled(false);
     ui->btnRun->setText("stop");
     ui->btnReq->setEnabled(true);
     ui->btnTimer->setEnabled(true);
@@ -105,7 +126,15 @@ void MainWindow::on_btnReq_clicked()
 
     QJsonDocument jsonDocument(jsonObject);
     QByteArray jsonString = jsonDocument.toJson(QJsonDocument::Indented);
-    m_tcpClient.write(jsonString.data(), jsonString.length());
+
+    if (m_isTcp) {
+        m_tcpClient.write(jsonString.data(), jsonString.length());
+    } else {
+        QString addr = ui->editAddr->text();
+        int port = ui->editPort->text().toInt();
+        QNetworkRequest req(QString("http://%1:%2/pingpong?data=%3").arg(addr).arg(port).arg(jsonString));
+        m_httpManager.get(req);
+    }
 }
 
 void MainWindow::on_btnTimer_clicked()
@@ -114,9 +143,8 @@ void MainWindow::on_btnTimer_clicked()
                        : m_timer.start(10);
 }
 
-void MainWindow::on_tcp_read(const char* buf, int len)
+void MainWindow::on_net_read(QByteArray &jsonString)
 {
-    QByteArray jsonString(buf, len);
     QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString);
     QJsonObject jsonObject = jsonDocument.object();
 

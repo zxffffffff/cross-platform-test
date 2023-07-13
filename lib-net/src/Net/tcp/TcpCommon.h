@@ -6,6 +6,7 @@
 #include <iostream>
 #include <functional>
 #include <thread>
+#include <atomic>
 #include <mutex>
 
 namespace Net {

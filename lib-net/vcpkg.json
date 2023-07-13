@@ -3,9 +3,11 @@
   "name": "cpp-deps-vcpkg",
   "version-string": "0.1.0",
   "dependencies": [
+    "gflags",
+    "glog",
     "libuv",
     "curl",
-    "gflags",
-    "glog"
+    "cpp-httplib",
+    "nlohmann-json"
   ]
 }

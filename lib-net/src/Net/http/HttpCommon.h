@@ -10,4 +10,6 @@
 
 namespace Net {
 
+using HandleReq = std::function<std::string(std::map<std::string, std::string> params)>;
+
 } // namespace Net

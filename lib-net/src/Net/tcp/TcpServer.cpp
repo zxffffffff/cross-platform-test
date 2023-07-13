@@ -11,6 +11,7 @@ TcpServer::TcpServer(const char* ip, int port, const char* logName)
 
 TcpServer::~TcpServer()
 {
+    Close();
 }
 
 void TcpServer::SetHandleRun(HandleRun f)

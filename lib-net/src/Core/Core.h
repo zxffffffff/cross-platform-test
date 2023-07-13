@@ -47,8 +47,14 @@ extern "C"
         const char *buf,
         int len);
 
-    // Tcp Server PingPong
-    CORE_LIB_API void pingpong_server_run(
+    // Tcp Server pingpong
+    CORE_LIB_API void tcp_server_pingpong(
+        const char *ip,
+        int port,
+        const char *logName = nullptr);
+
+    // Http Server "/pingpong" "data"
+    CORE_LIB_API void http_server_pingpong(
         const char *ip,
         int port,
         const char *logName = nullptr);

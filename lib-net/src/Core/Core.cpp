@@ -3,6 +3,7 @@
 #include "glog/logging.h"
 #include "tcp/TcpClient.h"
 #include "tcp/TcpServer.h"
+#include "http/HttpServer.h"
 
 void core_init(int argc, char *argv[])
 {
@@ -67,13 +68,27 @@ void tcp_client_write(
     p->Write(buf, len);
 }
 
-void pingpong_server_run(
+void tcp_server_pingpong(
     const char *ip,
     int port,
     const char *logName)
 {
     static auto p = std::make_unique<Net::TcpServer>(ip, port, logName);
-    p->SetHandleConnOnRead([](SocketPtr socket_ptr, const char *buf, size_t len)
-                           { p->Write(socket_ptr, buf, len); });
+    p->SetHandleConnOnRead([](SocketPtr socket_ptr, const char *buf, size_t len) {
+        p->Write(socket_ptr, buf, len);
+    });
+    p->Run();
+}
+
+void http_server_pingpong(
+    const char *ip,
+    int port,
+    const char *logName)
+{
+    static auto p = std::make_unique<Net::HttpServer>(ip, port, logName);
+    p->HandleGet("/pingpong", [](std::map<std::string, std::string> params){
+        std::string ret = params["data"];
+        return ret;
+    });
     p->Run();
 }

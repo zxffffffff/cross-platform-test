@@ -12,6 +12,9 @@ message(STATUS "[Net] CURL_VERSION_STRING : ${CURL_VERSION_STRING}")
 message(STATUS "[Net] CURL_INCLUDE_DIR : ${CURL_INCLUDE_DIR}")
 message(STATUS "[Net] CURL_LIBRARIES : ${CURL_LIBRARIES}")
 
+# 引入httplib库，也可使用header-only
+find_package(httplib CONFIG REQUIRED)
+
 # 静态库
 add_library(${PROJECT_NAME} STATIC
     Net.cpp
@@ -24,12 +27,15 @@ add_library(${PROJECT_NAME} STATIC
     "http/HttpCommon.h"
     "http/HttpClient.cpp"
     "http/HttpClient.h"
+    "http/HttpServer.cpp"
+    "http/HttpServer.h"
 )
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Common
     PRIVATE $<IF:$<TARGET_EXISTS:libuv::uv_a>,libuv::uv_a,libuv::uv>
     PRIVATE CURL::libcurl
+    PRIVATE httplib::httplib
 )
 
 target_include_directories(${PROJECT_NAME}

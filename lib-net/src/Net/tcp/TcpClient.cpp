@@ -11,6 +11,7 @@ TcpClient::TcpClient(const char* ip, int port, const char* logName)
 
 TcpClient::~TcpClient()
 {
+    Close();
 }
 
 void TcpClient::SetHandleRun(HandleRun f)

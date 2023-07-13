@@ -121,7 +121,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QWidget" name="tcp" native="true">
+            <widget class="QWidget" name="net" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout">
               <property name="leftMargin">
                <number>0</number>
@@ -183,6 +183,20 @@
                 <property name="text">
                  <string>8888</string>
                 </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="cbNet">
+                <item>
+                 <property name="text">
+                  <string>tcp</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>http</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item>

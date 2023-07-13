@@ -6,6 +6,8 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,14 +27,17 @@ public slots:
     void on_btnRun_clicked();
     void on_btnReq_clicked();
     void on_btnTimer_clicked();
-    void on_tcp_read(const char* buf, int len);
+
+    void on_net_read(QByteArray& buf);
 
     void on_btnPop_clicked();
 
 private:
     Ui::MainWindow *ui;
     MouseWidget* m_mouseWidget = nullptr;
+    bool m_isTcp = false; // or http
     TcpClient m_tcpClient;
+    QNetworkAccessManager m_httpManager;
     QTimer m_timer;
 };
 
